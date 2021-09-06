@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!-- ponemos, en la etiqueta ng-app, la raiz definida en
+     el script app.js mediante Angular -->
+<html lang="en" ng-app='miTienda'>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ejercicio Angular</title>
+
+    <!-- enlazamos bootstrap para poder usar rejillas, etc -->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+
+
+
+<!-- en la etiqueta de inicio del body llamamos al controlador creado en app.js -->
+<body ng-controller="TiendaController as tienda">
+
+    <!--iniciamos el 'contenedor' de bootstrap-->
+    <div class="container">
+
+    <!-- creamos un input para poder cambiar el numero de columnas (numColumnas) en las que se reparten los productos, lo que permite alterar el zoom con el que se ven -->
+    <div class="row">
+        Número de columnas: <input ng-model="tienda.numColumnas" type="number" min="2" max="4" />
+    </div>
+
+        <!-- hacemos dos bucles que recorran las filas en las que se reparten los productos (calculadas en el script app.js segun el numero de columnas) y otro para poner las variables de cada producto en estas filas. Tambien se determina el tipo de rejilla segun el numero de columnas que se haya indicado que queremos visualizar (numColumnas)-->
+        <div class="row" ng-repeat="fila in tienda.filas">
+            <div ng-class="{'col-sm-5': tienda.numColumnas == 2,'col-sm-4': tienda.numColumnas == 3, 'col-sm-3': tienda.numColumnas == 4}" ng-repeat="producto in fila">
+
+                <!-- ponemos el nombre del producto, que será acompañado por el stock, el cual tendra diferente estetica segun el stock restante, definido en el script app.js  -->
+                <h4>
+                    {{producto.nombre}}
+                    <span class="label" ng-class="tienda.stockClass(producto.stock)" > Stock: {{producto.stock}}</span>
+                </h4>
+
+                <!-- con el fichero cargado más adelante se usa un filtro para que el precio aparezca con decimales y el simbolo de euro. Si el articulo tiene descuento, el precio original se tacha y se remarca el precio tras hacer el descuento correspondiente, si no se mantiene tal cual -->
+                <div ng-if="producto.descuento">
+                    <p>
+                    <s>{{producto.precio|currency}}</s>
+                    <strong>{{(producto.precio - producto.precio*producto.descuento/100)|currency}}</strong>
+                    <p>¡Ahorra un {{producto.descuento}}%!</p>
+                    </p>
+                </div>
+                <div ng-if="!producto.descuento">
+                    <p>{{producto.precio|currency}}</p>
+                </div>
+                
+
+                <!-- la imagen del producto es reescalada con img-responsive para adecuar el tamaño al del contenedor de bootstrap -->
+                <img class="img-responsive" ng-src="{{producto.imagen}}">
+
+                <!-- añadimos el boton de compra, el cual se apagara cuando no haya stock, añadiendo un simbolo de un carrito de compra -->
+                <button type="button" class="btn btn-primary pull-right" ng-disabled="tienda.producto.stock==0">
+                    <span class="glyphicon glyphicon-shopping-cart" aria-hidden='true'></span>
+                    Comprar
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- cargamos el fichero descargado de la página oficial de Angular con filtros -->
+    <script src="node_modules/angular/angular.min.js"></script>
+    <!-- Aqui llamamos a Angular para trabajar con el, ademas de al script app.js donde se definen variables, etc-->
+    <script src="scripts/angular-locale_es-es.js"></script>
+    <script type="text/javascript" src='scripts/app.js'></script>
+
+</body>
+
+</html>
